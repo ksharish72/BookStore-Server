@@ -1,0 +1,14 @@
+[Unit]
+Description=server.js 
+After=network.target
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+EnvironmentFile=/etc/environment
+ExecStart=/usr/bin/node /home/ubuntu/webapp-server/server.js
+
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,69 @@
+version: 2.1
+orbs:
+  node: circleci/node@3.0.0
+  aws-s3: circleci/aws-s3@1.0.15
+jobs:
+  pr_check:
+    executor:
+      name: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          cache-path: ~/project/node_modules
+          override-ci-command: npm install
+      - run: npm run test
+  run_unit_tests:
+    executor:
+      name: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          cache-path: ~/project/node_modules
+          override-ci-command: npm install
+      - run: npm run test
+      - run: ls -al
+  upload_artifact_s3_deploy:
+    docker:
+      - image: "cimg/python:3.6"
+    steps:
+      - checkout
+      - run: ls -al
+      - run: rm -rf node_modules
+      - run: zip -r csye6225-server-${CIRCLE_BUILD_NUM}.zip ./
+      - run: mkdir codedeploy_artifact
+      - run: mv csye6225-server-${CIRCLE_BUILD_NUM}.zip codedeploy_artifact/ 
+      - run: ls -al
+      - aws-s3/sync:
+          from: codedeploy_artifact
+          to: "s3://${CODE_DEPLOY_BUCKET}"
+      - run: curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+      - run: unzip awscliv2.zip
+      - run: sudo ./aws/install
+      - run: aws --version
+      - run: aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}
+      - run: aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}
+      - run: aws configure set region ${AWS_REGION}
+      - run:
+          name: Code deploy
+          command: |
+                 aws deploy create-deployment --application-name csye6225-webapp \
+                   --deployment-config-name CodeDeployDefault.OneAtATime \
+                   --deployment-group-name csye6225-webapp-deployment \
+                   --ignore-application-stop-failures \
+                   --s3-location bucket=${CODE_DEPLOY_BUCKET},bundleType=zip,key=csye6225-server-${CIRCLE_BUILD_NUM}.zip   
+workflows:
+  pr_check:
+    jobs:
+      - pr_check
+  build_deploy:
+    jobs:
+      - run_unit_tests:
+          filters:
+            branches:
+              only: master
+      - upload_artifact_s3_deploy:
+          requires:
+            - run_unit_tests
+          filters:
+            branches:
+              only: master    

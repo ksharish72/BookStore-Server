@@ -1,0 +1,32 @@
+{
+  "name": "webapp-server",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "test": "mocha"
+  },
+  "dependencies": {
+    "app-root-path": "^3.0.0",
+    "assert": "^2.0.0",
+    "aws-sdk": "^2.698.0",
+    "axios": "^0.19.2",
+    "bcrypt": "^4.0.1",
+    "body-parser": "^1.19.0",
+    "chai": "^4.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-formidable": "^1.2.0",
+    "generate-password": "^1.5.1",
+    "install": "^0.13.0",
+    "jsonwebtoken": "^8.5.1",
+    "log4js": "^6.1.2",
+    "mocha": "^7.2.0",
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.2",
+    "response-time": "^2.3.2",
+    "statman-stopwatch": "^2.11.1",
+    "statsd-client": "^0.4.4"
+  }
+}

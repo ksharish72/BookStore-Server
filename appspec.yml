@@ -1,0 +1,25 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /home/ubuntu/webapp-server
+  - source: /cloudwatch-config.json
+    destination: /opt
+permissions:
+  - object: /
+    owner: ubuntu
+    group: ubuntu
+hooks:
+  BeforeInstall:
+    - location: codedeploy/beforeInstall.sh
+      timeout: 1000
+      runas: root
+  AfterInstall:
+    - location: codedeploy/afterInstall.sh
+      timeout: 1000
+      runas: root
+  ApplicationStart:
+    - location: codedeploy/applicationStart.sh
+      timeout: 1000
+      runas: root
+ 
